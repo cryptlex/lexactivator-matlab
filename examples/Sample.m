@@ -4,16 +4,18 @@ sAppVersion = 'PASTE_YOUR_APP_VERION';
 
 %Loads the C library of LexActivator
 sHeaderFile = './LexActivator.h';
+sStatusHeaderFile = './LexStatusCodes.h';
 sSharedLibrary = 'LexActivator';
 %unloadlibrary(sSharedLibrary)
-if ~libisloaded(sSharedLibrary)
-    loadlibrary(sSharedLibrary,sHeaderFile)
+if not(libisloaded(sSharedLibrary))
+   loadlibrary(sSharedLibrary,sHeaderFile, 'addheader',sStatusHeaderFile);
 end
 %Creates and prints the list of the functions of the library with their arguments
 %list = libfunctions(sSharedLibrary,'-full');
 
 % Calls function to set the product data
 status = calllib(sSharedLibrary,'SetProductData',[int8(sProductData) 0]);
+
 if status ~= 0
     fprintf('Error Code: %.0f\n',status)
     return
@@ -34,24 +36,24 @@ end
 % Calls function to check if license is activated
 status = calllib(sSharedLibrary,'IsLicenseGenuine');
 if status == 0
-    fprintf('License is genuinely activated!')
-elseif 2 == status
-    fprintf('License is genuinely activated but has expired!')
-elseif 3 == status
-    fprintf('License is genuinely activated but has been suspended!')
-elseif 4 == status
-    fprintf('License is genuinely activated but grace period is over!')
+    fprintf('License is genuinely activated!\n')
+elseif status == 20
+    fprintf('License is genuinely activated but has expired!\n')
+elseif status == 21
+    fprintf('License is genuinely activated but has been suspended!\n')
+elseif status == 22
+    fprintf('License is genuinely activated but grace period is over!\n')
 else
     % Calls function to check if license is activated
     trialStatus = calllib(sSharedLibrary,'IsTrialGenuine');
     if trialStatus == 0
         fprintf('Trial is valid')
-    elseif 5 == trialStatus
+    elseif trialStatus == 25
         fprintf('Trial has expired!')
         % Time to buy the license and activate the app
         activate()
     else
-        fprintf('Either trial has not started or has been tampered!')
+        fprintf('Either trial has not started or has been tampered!\n')
         % Activating the trial
         activateTrial()
     end
@@ -68,7 +70,7 @@ function activate()
 	end
     % Calls function to activate the license key
     status = calllib(sSharedLibrary,'ActivateLicense');
-	if status == 0 || status == 2 || status == 3
+	if status == 0 || status == 20 || status == 21
 		fprintf('License activated successfully: %.0f\n',status)
 	else
 		fprintf('License activation failed: %.0f\n',status)
@@ -80,9 +82,9 @@ function activateTrial()
     % Calls function to activate the trial
     status = calllib(sSharedLibrary,'ActivateTrial');
 	if status == 0
-		fprintf('Product trial activated successfully!')
-	elseif status == 3
-		fprintf('Product trial has expired!')
+		fprintf('Product trial activated successfully!\n')
+	elseif status == 25
+		fprintf('Product trial has expired!\n')
 	else
 		fprintf('Product trial activation failed:%.0f\n',status)
 	end

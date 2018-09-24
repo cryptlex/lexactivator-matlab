@@ -1,70 +1,89 @@
-sHeaderFile = './LexActivator.h';
-sSharedLibrary = 'LexActivator';
-
-function = init()
-
 sProductData = 'PASTE_CONTENT_OF_PRODUCT.DAT_FILE';
 sProductId = 'PASTE_PRODUCT_ID';
 sAppVersion = 'PASTE_YOUR_APP_VERION';
 
 %Loads the C library of LexActivator
-loadlibrary(sSharedLibrary,sHeaderFile)
-%Creates and prints the list of the functions of the library with their arguement
-list = libfunctions(sSharedLibrary,'-full')
-%calls function to set the product data
-calllib(sSharedLibrary,'SetProductData',[int8(sProductData) 0])
-%calls function to set the product id
-calllib(sSharedLibrary,'SetProductId',[int8(sProductId) 0], uint32(1))
-%calls function to set the product id
-calllib(sSharedLibrary,'SetAppVersion',[int8(sAppVersion) 0])
+sHeaderFile = './LexActivator.h';
+sSharedLibrary = 'LexActivator';
+%unloadlibrary(sSharedLibrary)
+if ~libisloaded(sSharedLibrary)
+    loadlibrary(sSharedLibrary,sHeaderFile)
+end
+%Creates and prints the list of the functions of the library with their arguments
+%list = libfunctions(sSharedLibrary,'-full');
 
+% Calls function to set the product data
+status = calllib(sSharedLibrary,'SetProductData',[int8(sProductData) 0]);
+if status ~= 0
+    fprintf('Error Code: %.0f\n',status)
+    return
+end
+% Calls function to set the product id
+status = calllib(sSharedLibrary,'SetProductId',[int8(sProductId) 0], uint32(1));
+if status ~= 0
+    fprintf('Error Code: %.0f\n',status)
+    return
+end
+% Calls function to set the app version
+status = calllib(sSharedLibrary,'SetAppVersion',[int8(sAppVersion) 0]);
+if status ~= 0
+    fprintf('Error Code: %.0f\n',status)
+    return
 end
 
-function = activate()
-
-sLicenseKey = 'PASTE_LICENCE_KEY';
-%calls function to set the license key
-calllib(sSharedLibrary,'SetLicenseKey',[int8(sLicenseKey) 0])
-%calls function to activate the license key
-calllib(sSharedLibrary,'ActivateLicense')
-
+% Calls function to check if license is activated
+status = calllib(sSharedLibrary,'IsLicenseGenuine');
+if status == 0
+    fprintf('License is genuinely activated!')
+elseif 2 == status
+    fprintf('License is genuinely activated but has expired!')
+elseif 3 == status
+    fprintf('License is genuinely activated but has been suspended!')
+elseif 4 == status
+    fprintf('License is genuinely activated but grace period is over!')
+else
+    % Calls function to check if license is activated
+    trialStatus = calllib(sSharedLibrary,'IsTrialGenuine');
+    if trialStatus == 0
+        fprintf('Trial is valid')
+    elseif 5 == trialStatus
+        fprintf('Trial has expired!')
+        % Time to buy the license and activate the app
+        activate()
+    else
+        fprintf('Either trial has not started or has been tampered!')
+        % Activating the trial
+        activateTrial()
+    end
 end
 
+function activate()
+    sSharedLibrary = 'LexActivator';
+    sLicenseKey = 'PASTE_LICENCE_KEY';
+    % Calls function to set the license key
+    status = calllib(sSharedLibrary,'SetLicenseKey',[int8(sLicenseKey) 0]);
+	if status ~= 0
+		fprintf('Error Code: %.0f\n',status)
+		return
+	end
+    % Calls function to activate the license key
+    status = calllib(sSharedLibrary,'ActivateLicense');
+	if status == 0 || status == 2 || status == 3
+		fprintf('License activated successfully: %.0f\n',status)
+	else
+		fprintf('License activation failed: %.0f\n',status)
+	end
+end
 
-function = activateTrial() {
-
-%calls function to activate the trial
-calllib(sSharedLibrary,'ActivateTrial',[int8(sProductId) 0], uint32(1))
-
-}
-
-function = main() {
-	init()
-	var status C.int
-	%calls function to check if license is activated
-	calllib(sSharedLibrary,'IsLicenseGenuine')
-	if C.LA_OK == status {
-		fmt.Println("License is genuinely activated!")
-	} else if C.LA_EXPIRED == status {
-		fmt.Println("License is genuinely activated but has expired!")
-	} else if C.LA_SUSPENDED == status {
-		fmt.Println("License is genuinely activated but has been suspended!")
-	} else if C.LA_GRACE_PERIOD_OVER == status {
-		fmt.Println("License is genuinely activated but grace period is over!")
-	} else {
-		%calls function to check if license is activated
-	    calllib(sSharedLibrary,'IsTrialGenuine')
-		if C.LA_OK == trialStatus {
-			fmt.Println("Trial is valid")
-		} else if C.LA_TRIAL_EXPIRED == trialStatus {
-			fmt.Println("Trial has expired!")
-			// Time to buy the license and activate the app
-			%calls function to check if license is activated
-			activate()
-		} else {
-			fmt.Println("Either trial has not started or has been tampered!")
-			// Activating the trial
-			activateTrial()
-		}
-	}
-}
+function activateTrial()
+    sSharedLibrary = 'LexActivator';
+    % Calls function to activate the trial
+    status = calllib(sSharedLibrary,'ActivateTrial');
+	if status == 0
+		fprintf('Product trial activated successfully!')
+	elseif status == 3
+		fprintf('Product trial has expired!')
+	else
+		fprintf('Product trial activation failed:%.0f\n',status)
+	end
+end

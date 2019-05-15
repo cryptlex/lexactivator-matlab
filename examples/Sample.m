@@ -14,20 +14,20 @@ end
 %list = libfunctions(sSharedLibrary,'-full');
 
 % Calls function to set the product data
-status = calllib(sSharedLibrary,'SetProductData',[int8(sProductData) 0]);
+status = calllib(sSharedLibrary,'SetProductData',toString(sProductData));
 
 if status ~= 0
     fprintf('Error Code: %.0f\n',status)
     return
 end
 % Calls function to set the product id
-status = calllib(sSharedLibrary,'SetProductId',[int8(sProductId) 0], uint32(1));
+status = calllib(sSharedLibrary,'SetProductId',toString(sProductId), uint32(1));
 if status ~= 0
     fprintf('Error Code: %.0f\n',status)
     return
 end
 % Calls function to set the app version
-status = calllib(sSharedLibrary,'SetAppVersion',[int8(sAppVersion) 0]);
+status = calllib(sSharedLibrary,'SetAppVersion',toString(sAppVersion));
 if status ~= 0
     fprintf('Error Code: %.0f\n',status)
     return
@@ -59,11 +59,19 @@ else
     end
 end
 
+function output = toString(input)
+    if ispc
+        output = [int8(input) 0];
+    else
+        output = input;
+    end
+end
+
 function activate()
     sSharedLibrary = 'LexActivator';
     sLicenseKey = 'PASTE_LICENCE_KEY';
     % Calls function to set the license key
-    status = calllib(sSharedLibrary,'SetLicenseKey',[int8(sLicenseKey) 0]);
+    status = calllib(sSharedLibrary,'SetLicenseKey', toString(sLicenseKey));
 	if status ~= 0
 		fprintf('Error Code: %.0f\n',status)
 		return

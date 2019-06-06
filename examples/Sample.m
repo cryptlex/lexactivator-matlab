@@ -37,6 +37,8 @@ end
 status = calllib(sSharedLibrary,'IsLicenseGenuine');
 if status == 0
     fprintf('License is genuinely activated!\n')
+    % [status, metadataKey, metadataValue] = calllib(sSharedLibrary,'GetLicenseMetadata', toString('feature1'), blanks(256),256 );
+    % disp(metadataValue);
 elseif status == 20
     fprintf('License is genuinely activated but has expired!\n')
 elseif status == 21

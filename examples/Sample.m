@@ -1,6 +1,6 @@
 sProductData = 'PASTE_CONTENT_OF_PRODUCT.DAT_FILE';
 sProductId = 'PASTE_PRODUCT_ID';
-sAppVersion = 'PASTE_YOUR_APP_VERION';
+sReleaseVersion = '1.0.0';
 
 %Loads the C library of LexActivator
 sHeaderFile = './LexActivator.h';
@@ -26,8 +26,8 @@ if status ~= 0
     fprintf('Error Code: %.0f\n',status)
     return
 end
-% Calls function to set the app version
-status = calllib(sSharedLibrary,'SetAppVersion',toString(sAppVersion));
+% Calls function to set the release version
+status = calllib(sSharedLibrary,'SetReleaseVersion',toString(sReleaseVersion));
 if status ~= 0
     fprintf('Error Code: %.0f\n',status)
     return

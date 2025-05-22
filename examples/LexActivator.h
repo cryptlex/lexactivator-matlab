@@ -733,7 +733,6 @@ LEXACTIVATOR_API int LA_CC GetLicenseActivationDate(uint32_t *activationDate);
 
     RETURN CODES: LA_OK, LA_FAIL, LA_E_PRODUCT_ID, LA_E_LICENSE_KEY, LA_E_TIME, LA_E_TIME_MODIFIED
 */
-
 LEXACTIVATOR_API int LA_CC GetActivationCreationDate(uint32_t *activationCreationDate);
 
 /*

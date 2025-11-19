@@ -113,12 +113,14 @@ typedef struct
     * featureName         - Name of the feature.
     * featureDisplayName  - Display name of the feature.
     * value               - Value associated with the feature.
+    * expiresAt           - Timestamp when the license feature entitlement will expire.
 */
 typedef struct 
 {
     CHARTYPE featureName[BUFFER_SIZE_256];
     CHARTYPE featureDisplayName[BUFFER_SIZE_256];
     CHARTYPE value[BUFFER_SIZE_256];
+    int64_t expiresAt;
 } FeatureEntitlement;
 
 /*
@@ -141,6 +143,8 @@ typedef struct
     * allowedActivations   - Maximum number of activations allowed.
     * allowedDeactivations - Maximum number of deactivations allowed.
     * key                  - License key.
+    * totalActivations     - Total number of activations for the license.
+    * totalDeactivations   - Total number of deactivations for the license
     * type                 - Type of the license (e.g., "node-locked", "floating").
     * metadata             - Array of metadata associated with the user's license.
 */
@@ -149,6 +153,8 @@ typedef struct
     int64_t allowedActivations;
     int64_t allowedDeactivations;
     CHARTYPE key[BUFFER_SIZE_256];
+    uint32_t totalActivations;
+    uint32_t totalDeactivations;
     CHARTYPE type[BUFFER_SIZE_256];
     Metadata metadata[MAX_METADATA_SIZE];
 } UserLicense;

@@ -112,7 +112,8 @@ typedef struct
     MEMBERS:
     * featureName         - Name of the feature.
     * featureDisplayName  - Display name of the feature.
-    * value               - Value associated with the feature.
+    * value               - Effective value of the feature. Contains the overridden value if set at the license level; otherwise, the entitlement set value.
+    * baseValue           - Default value of the feature defined in the entitlement set; empty for features not inherited from an entitlement set.
     * expiresAt           - Timestamp when the license feature entitlement will expire.
 */
 typedef struct 
@@ -120,6 +121,7 @@ typedef struct
     CHARTYPE featureName[BUFFER_SIZE_256];
     CHARTYPE featureDisplayName[BUFFER_SIZE_256];
     CHARTYPE value[BUFFER_SIZE_256];
+    CHARTYPE baseValue[BUFFER_SIZE_256];
     int64_t expiresAt;
 } FeatureEntitlement;
 
